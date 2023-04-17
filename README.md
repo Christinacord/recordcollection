@@ -1,11 +1,4 @@
-# Module3 Project Gamma
-
-## Getting started
-
-You have a project repository, now what? The next section
-lists all of the deliverables that are due at the end of the
-week. Below is some guidance for getting started on the
-tasks for this week.
+# Project Name
 
 ## Install Extensions
 
