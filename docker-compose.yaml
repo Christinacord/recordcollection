@@ -1,13 +1,49 @@
 # volumes:
+volumes:
+  postgres-data:
+    external: true
+  pg-admin:
+    external: true
+
 services:
+  postgres:
+    build:
+      context: ./relational-data
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: fastapi
+    ports:
+      - 15432:5432
+
+  pg-admin:
+    image: dpage/pgadmin4
+    volumes:
+      - pg-admin:/var/lib/pgadmin
+    ports:
+      - 8082:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: records@recordcollection.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_DISABLE_POSTFIX: 1
+
   fastapi:
     build:
-      context: sample_service
+      context: fastAPI
       dockerfile: Dockerfile.dev
     ports:
       - 8000:8000
     volumes:
       - ./sample_service:/app
+    environment:
+      SIGNING_KEY: ${SIGNING_KEY}
+      WAIT_HOSTS: postgres:5432
+      WAIT_BEFORE: 5
+      WAIT_TIMEOUT: 60
+      DATABASE_URL: postgresql://user:password@postgres/fastapi
 
   ghi:
     image: node:lts-bullseye
@@ -22,4 +58,4 @@ services:
       NODE_ENV: development
       HOST: "0.0.0.0"
       PUBLIC_URL: http://localhost:3000
-      REACT_APP_SAMPLE_SERVICE_API_HOST: ${REACT_APP_SAMPLE_SERVICE_API_HOST}
+      REACT_APP_ACCOUNTS_HOST: http://localhost:8000
